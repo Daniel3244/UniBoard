@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Uniboard.Application.Common.Interfaces;
+using Uniboard.Application.Projects;
 using Uniboard.Infrastructure.Persistence;
+using Uniboard.Infrastructure.Repositories;
 
 namespace Uniboard.Infrastructure;
 
@@ -23,6 +25,7 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<UniboardDbContext>());
+        services.AddScoped<IProjectRepository, ProjectRepository>();
 
         return services;
     }
