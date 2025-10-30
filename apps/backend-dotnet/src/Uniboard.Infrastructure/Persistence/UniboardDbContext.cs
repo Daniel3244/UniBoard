@@ -8,6 +8,7 @@ public sealed class UniboardDbContext(DbContextOptions<UniboardDbContext> option
     : DbContext(options), IApplicationDbContext
 {
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<TaskItem> TaskItems => Set<TaskItem>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

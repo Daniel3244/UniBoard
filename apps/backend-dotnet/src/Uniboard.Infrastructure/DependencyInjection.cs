@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Uniboard.Application.Common.Interfaces;
 using Uniboard.Application.Projects;
+using Uniboard.Application.Tasks;
 using Uniboard.Infrastructure.Persistence;
 using Uniboard.Infrastructure.Repositories;
 
@@ -26,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<UniboardDbContext>());
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<ITaskRepository, TaskRepository>();
 
         return services;
     }

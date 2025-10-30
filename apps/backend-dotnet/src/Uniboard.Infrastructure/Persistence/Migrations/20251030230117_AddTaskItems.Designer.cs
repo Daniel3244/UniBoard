@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Uniboard.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using Uniboard.Infrastructure.Persistence;
 namespace Uniboard.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(UniboardDbContext))]
-    partial class UniboardDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251030230117_AddTaskItems")]
+    partial class AddTaskItems
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
