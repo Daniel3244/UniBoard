@@ -1,0 +1,52 @@
+# Build outputs
+bin/
+obj/
+out/
+TestResults/
+
+# User-specific files
+*.user
+*.rsuser
+*.suo
+*.userprefs
+
+# Logs
+*.log
+logs/
+
+# VS / VS Code
+.vs/
+.vscode/
+*.code-workspace
+
+# Rider
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Node / frontend
+node_modules/
+*.tsbuildinfo
+dist/
+build/
+.parcel-cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Docker
+*.iml
+docker-data/
+
+# Coverage / reports
+coverage/
+nyc_output/
+lcov.info
+
+# Temporary
+tmp/
+temp/
