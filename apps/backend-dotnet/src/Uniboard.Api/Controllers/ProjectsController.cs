@@ -1,4 +1,5 @@
 using System.Linq;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Uniboard.Api.Contracts.Projects;
 using Uniboard.Application.Projects;
@@ -6,6 +7,7 @@ using Uniboard.Domain.Entities;
 
 namespace Uniboard.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/[controller]")]
 public class ProjectsController(IProjectRepository repository) : ControllerBase
@@ -65,6 +67,7 @@ public class ProjectsController(IProjectRepository repository) : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteProject(Guid id, CancellationToken cancellationToken)
     {

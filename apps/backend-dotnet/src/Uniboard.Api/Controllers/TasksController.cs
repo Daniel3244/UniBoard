@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Uniboard.Api.Contracts.Tasks;
 using Uniboard.Application.Projects;
@@ -7,6 +8,7 @@ using Uniboard.Domain.Entities;
 
 namespace Uniboard.Api.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/projects/{projectId:guid}/tasks")]
 public class TasksController(
@@ -84,6 +86,7 @@ public class TasksController(
         return NoContent();
     }
 
+    [Authorize(Policy = "AdminOnly")]
     [HttpDelete("{taskId:guid}")]
     public async Task<IActionResult> DeleteTask(Guid projectId, Guid taskId, CancellationToken cancellationToken)
     {
