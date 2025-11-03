@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import {
   HubConnection,
   HubConnectionBuilder,
@@ -7,12 +7,14 @@ import {
 } from "@microsoft/signalr";
 import { useAuthContext } from "../auth/AuthContext";
 import { API_BASE_URL } from "../shared/api-client";
+import type { Comment } from "./task-comments-types";
 import type { Task } from "./projects-types";
 
 type TaskRealtimeHandlers = {
   onTaskCreated?: (task: Task) => void;
   onTaskUpdated?: (task: Task) => void;
   onTaskDeleted?: (taskId: string) => void;
+  onCommentAdded?: (comment: Comment) => void;
 };
 
 const HUB_PATH = "/hubs/tasks";
@@ -60,6 +62,9 @@ export const useTasksRealtime = (
     connection.on("TaskDeleted", (taskId: string) => {
       handlersRef.current.onTaskDeleted?.(taskId);
     });
+    connection.on("CommentAdded", (comment: Comment) => {
+      handlersRef.current.onCommentAdded?.(comment);
+    });
 
     const start = async () => {
       try {
@@ -85,6 +90,7 @@ export const useTasksRealtime = (
           connection.off("TaskCreated");
           connection.off("TaskUpdated");
           connection.off("TaskDeleted");
+          connection.off("CommentAdded");
           await connection.stop();
         }
       };

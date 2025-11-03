@@ -2,6 +2,8 @@
 import { Box, Stack, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuthContext } from "../auth/AuthContext";
+import { ActivityTimeline } from "../activity/ActivityTimeline";
+import { useActivityStream } from "../activity/useActivityStream";
 import { ProjectsList } from "./components/ProjectsList";
 import { ProjectTasksPane } from "./components/ProjectTasksPane";
 import { useProjectsQueries } from "./projects-hooks";
@@ -24,6 +26,7 @@ export const ProjectsDashboardPage = () => {
     updateTaskMutation,
     deleteTaskMutation,
   } = useProjectsQueries(selectedProjectId ?? undefined);
+  useActivityStream();
 
   const selectedProject = useMemo(
     () => projects.find((project) => project.id === selectedProjectId) ?? null,
@@ -91,6 +94,8 @@ export const ProjectsDashboardPage = () => {
           />
         </Box>
       </Stack>
+
+      <ActivityTimeline />
     </Stack>
   );
 };

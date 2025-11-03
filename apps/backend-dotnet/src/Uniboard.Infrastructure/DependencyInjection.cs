@@ -2,6 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Uniboard.Application.Comments;
 using Uniboard.Application.Common.Interfaces;
 using Uniboard.Application.Projects;
 using Uniboard.Application.Tasks;
@@ -35,6 +36,7 @@ public static class DependencyInjection
             provider.GetRequiredService<UniboardDbContext>());
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ITaskRepository, TaskRepository>();
+        services.AddScoped<ITaskCommentRepository, TaskCommentRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();

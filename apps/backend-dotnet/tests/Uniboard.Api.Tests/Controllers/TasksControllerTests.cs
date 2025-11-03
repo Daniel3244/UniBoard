@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
 using Xunit;
+using Uniboard.Api.Contracts.Activity;
 using Uniboard.Api.Contracts.Tasks;
 using Uniboard.Api.Controllers;
 using Uniboard.Api.Mapping;
@@ -27,6 +28,7 @@ public sealed class TasksControllerTests
     private readonly Mock<IHubContext<TaskHub>> _hubContext = new();
     private readonly Mock<IHubClients> _hubClients = new();
     private readonly Mock<IClientProxy> _clientProxy = new();
+    private readonly Mock<IActivityEmitter> _activityEmitter = new();
 
     public TasksControllerTests()
     {
@@ -37,6 +39,10 @@ public sealed class TasksControllerTests
         _hubClients.Setup(x => x.Group(It.IsAny<string>())).Returns(_clientProxy.Object);
         _clientProxy
             .Setup(x => x.SendCoreAsync(It.IsAny<string>(), It.IsAny<object?[]>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
+        _activityEmitter
+            .Setup(x => x.PublishAsync(It.IsAny<ActivityEvent>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
     }
 
@@ -65,6 +71,12 @@ public sealed class TasksControllerTests
                 x.SendCoreAsync(
                     "TaskCreated",
                     It.Is<object?[]>(args => MatchesTaskPayload(args, request.Title, request.Status)),
+                    It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        _activityEmitter.Verify(x =>
+                x.PublishAsync(
+                    It.Is<ActivityEvent>(evt => evt.Type == "task_created" && evt.ProjectId == projectId),
                     It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -107,6 +119,12 @@ public sealed class TasksControllerTests
                     It.Is<object?[]>(args => MatchesTaskPayload(args, request.Title, request.Status, taskId)),
                     It.IsAny<CancellationToken>()),
             Times.Once);
+
+        _activityEmitter.Verify(x =>
+                x.PublishAsync(
+                    It.Is<ActivityEvent>(evt => evt.Type == "task_updated" && evt.TaskId == taskId),
+                    It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]
@@ -144,6 +162,12 @@ public sealed class TasksControllerTests
                 x.SendCoreAsync(
                     "TaskDeleted",
                     It.Is<object?[]>(args => MatchesTaskDeleted(args, taskId)),
+                    It.IsAny<CancellationToken>()),
+            Times.Once);
+
+        _activityEmitter.Verify(x =>
+                x.PublishAsync(
+                    It.Is<ActivityEvent>(evt => evt.Type == "task_deleted" && evt.TaskId == taskId),
                     It.IsAny<CancellationToken>()),
             Times.Once);
     }
@@ -188,5 +212,6 @@ public sealed class TasksControllerTests
             _projectRepository.Object,
             _taskRepository.Object,
             _hubContext.Object,
+            _activityEmitter.Object,
             _mapper);
 }

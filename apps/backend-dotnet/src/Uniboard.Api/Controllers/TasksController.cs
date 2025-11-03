@@ -1,7 +1,8 @@
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Uniboard.Api.Contracts.Activity;
 using Uniboard.Api.Contracts.Tasks;
 using Uniboard.Api.Realtime;
 using Uniboard.Application.Projects;
@@ -17,6 +18,7 @@ public class TasksController(
     IProjectRepository projectRepository,
     ITaskRepository taskRepository,
     IHubContext<TaskHub> hubContext,
+    IActivityEmitter activityEmitter,
     IMapper mapper) : ControllerBase
 {
     [HttpGet]
@@ -52,7 +54,8 @@ public class TasksController(
     [HttpPost]
     public async Task<ActionResult<TaskResponse>> CreateTask(Guid projectId, CreateTaskRequest request, CancellationToken cancellationToken)
     {
-        if (!await ProjectExists(projectId, cancellationToken))
+        var project = await projectRepository.GetByIdAsync(projectId, cancellationToken);
+        if (project is null)
         {
             return NotFound();
         }
@@ -69,13 +72,25 @@ public class TasksController(
             .Group(TaskHub.GetGroupName(projectId))
             .SendAsync("TaskCreated", response, cancellationToken: cancellationToken);
 
+        await activityEmitter.PublishAsync(new ActivityEvent(
+            Guid.NewGuid(),
+            "task_created",
+            $"Dodano zadanie \"{task.Title}\"",
+            $"Projekt: {project.Name}",
+            projectId,
+            task.Id,
+            null,
+            task.CreatedAt),
+            cancellationToken);
+
         return CreatedAtAction(nameof(GetTask), new { projectId, taskId = task.Id }, response);
     }
 
     [HttpPut("{taskId:guid}")]
     public async Task<IActionResult> UpdateTask(Guid projectId, Guid taskId, UpdateTaskRequest request, CancellationToken cancellationToken)
     {
-        if (!await ProjectExists(projectId, cancellationToken))
+        var project = await projectRepository.GetByIdAsync(projectId, cancellationToken);
+        if (project is null)
         {
             return NotFound();
         }
@@ -95,6 +110,17 @@ public class TasksController(
             .Group(TaskHub.GetGroupName(projectId))
             .SendAsync("TaskUpdated", response, cancellationToken: cancellationToken);
 
+        await activityEmitter.PublishAsync(new ActivityEvent(
+            Guid.NewGuid(),
+            "task_updated",
+            $"Zmieniono zadanie \"{task.Title}\"",
+            $"Projekt: {project.Name}",
+            projectId,
+            task.Id,
+            null,
+            DateTime.UtcNow),
+            cancellationToken);
+
         return NoContent();
     }
 
@@ -102,7 +128,8 @@ public class TasksController(
     [HttpDelete("{taskId:guid}")]
     public async Task<IActionResult> DeleteTask(Guid projectId, Guid taskId, CancellationToken cancellationToken)
     {
-        if (!await ProjectExists(projectId, cancellationToken))
+        var project = await projectRepository.GetByIdAsync(projectId, cancellationToken);
+        if (project is null)
         {
             return NotFound();
         }
@@ -117,6 +144,18 @@ public class TasksController(
         await hubContext.Clients
             .Group(TaskHub.GetGroupName(projectId))
             .SendAsync("TaskDeleted", taskId, cancellationToken: cancellationToken);
+
+        await activityEmitter.PublishAsync(new ActivityEvent(
+            Guid.NewGuid(),
+            "task_deleted",
+            $"Usunięto zadanie \"{task.Title}\"",
+            $"Projekt: {project.Name}",
+            projectId,
+            task.Id,
+            null,
+            DateTime.UtcNow),
+            cancellationToken);
+
         return NoContent();
     }
 

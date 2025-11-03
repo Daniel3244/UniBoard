@@ -15,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<IActivityEmitter, ActivityEmitter>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -83,6 +84,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapHub<TaskHub>("/hubs/tasks");
+app.MapHub<ActivityHub>("/hubs/activity");
 
 app.Run();
 

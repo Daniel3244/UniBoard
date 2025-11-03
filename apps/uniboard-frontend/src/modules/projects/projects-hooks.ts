@@ -15,9 +15,11 @@ import type {
   Task,
   UpdateTaskPayload,
 } from "./projects-types";
+import type { Comment } from "./task-comments-types";
+import { buildCommentQueryKey } from "./task-comments-hooks";
 import { useTasksRealtime } from "./useTasksRealtime";
 
-const PROJECTS_QUERY_KEY = ["projects"] as const;
+export const PROJECTS_QUERY_KEY = ["projects"] as const;
 
 type UpdateTaskVariables = {
   taskId: string;
@@ -189,6 +191,24 @@ export const useProjectsQueries = (projectId?: string) => {
       notify({
         message: "A task was removed",
         severity: "warning",
+      });
+    },
+    onCommentAdded: (comment) => {
+      queryClient.setQueryData(
+        buildCommentQueryKey(comment.projectId, comment.taskId),
+        (current: Comment[] | undefined) => {
+          if (!current) {
+            return [comment];
+          }
+          if (current.some((existing) => existing.id === comment.id)) {
+            return current;
+          }
+          return [...current, comment];
+        },
+      );
+      notify({
+        message: "Dodano nowy komentarz",
+        severity: "info",
       });
     },
   });

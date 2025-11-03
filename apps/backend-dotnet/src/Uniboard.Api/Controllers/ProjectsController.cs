@@ -1,7 +1,9 @@
-using System.Linq;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Uniboard.Api.Contracts.Activity;
 using Uniboard.Api.Contracts.Projects;
+using Uniboard.Api.Realtime;
 using Uniboard.Application.Projects;
 using Uniboard.Domain.Entities;
 
@@ -10,7 +12,7 @@ namespace Uniboard.Api.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/[controller]")]
-public class ProjectsController(IProjectRepository repository) : ControllerBase
+public class ProjectsController(IProjectRepository repository, IActivityEmitter activityEmitter) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ProjectResponse>>> GetProjects(CancellationToken cancellationToken)
@@ -44,6 +46,17 @@ public class ProjectsController(IProjectRepository repository) : ControllerBase
 
         await repository.AddAsync(project, cancellationToken);
 
+        await activityEmitter.PublishAsync(new ActivityEvent(
+            Guid.NewGuid(),
+            "project_created",
+            $"Nowy projekt: {project.Name}",
+            project.Description,
+            project.Id,
+            null,
+            null,
+            project.CreatedAt),
+            cancellationToken);
+
         return CreatedAtAction(
             nameof(GetProject),
             new { id = project.Id },
@@ -64,6 +77,17 @@ public class ProjectsController(IProjectRepository repository) : ControllerBase
 
         await repository.UpdateAsync(existing, cancellationToken);
 
+        await activityEmitter.PublishAsync(new ActivityEvent(
+            Guid.NewGuid(),
+            "project_updated",
+            $"Zmieniono projekt: {existing.Name}",
+            existing.Description,
+            existing.Id,
+            null,
+            null,
+            DateTime.UtcNow),
+            cancellationToken);
+
         return NoContent();
     }
 
@@ -78,6 +102,18 @@ public class ProjectsController(IProjectRepository repository) : ControllerBase
         }
 
         await repository.DeleteAsync(existing, cancellationToken);
+
+        await activityEmitter.PublishAsync(new ActivityEvent(
+            Guid.NewGuid(),
+            "project_deleted",
+            $"Usunięto projekt: {existing.Name}",
+            existing.Description,
+            existing.Id,
+            null,
+            null,
+            DateTime.UtcNow),
+            cancellationToken);
+
         return NoContent();
     }
 }

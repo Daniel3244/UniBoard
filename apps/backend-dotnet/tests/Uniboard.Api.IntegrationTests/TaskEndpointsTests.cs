@@ -1,10 +1,11 @@
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Uniboard.Api.Contracts.Auth;
+using Uniboard.Api.Contracts.Comments;
 using Uniboard.Api.Contracts.Projects;
 using Uniboard.Api.Contracts.Tasks;
 using Uniboard.Api.IntegrationTests.Fixtures;
@@ -93,8 +94,23 @@ public sealed class TaskEndpointsTests : IClassFixture<PostgresContainerFixture>
         task!.Title.Should().Be("Verify API");
         task.Status.Should().Be("todo");
 
+        var createCommentResponse = await client.PostAsJsonAsync(
+            $"/api/projects/{project.Id}/tasks/{task.Id}/comments",
+            new { body = "Integration comment" });
+
+        createCommentResponse.EnsureSuccessStatusCode();
+        var comment = await createCommentResponse.Content.ReadFromJsonAsync<CommentResponse>();
+        comment.Should().NotBeNull();
+        comment!.TaskId.Should().Be(task.Id);
+        comment.AuthorEmail.Should().Be(email);
+
         var tasks = await client.GetFromJsonAsync<TaskResponse[]>($"/api/projects/{project.Id}/tasks");
         tasks.Should().NotBeNull();
         tasks!.Should().ContainSingle(t => t.Id == task.Id);
+
+        var comments = await client.GetFromJsonAsync<CommentResponse[]>(
+            $"/api/projects/{project.Id}/tasks/{task.Id}/comments");
+        comments.Should().NotBeNull();
+        comments!.Should().ContainSingle(c => c.Id == comment.Id);
     }
 }

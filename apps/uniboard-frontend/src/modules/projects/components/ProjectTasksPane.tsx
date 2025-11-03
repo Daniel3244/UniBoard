@@ -1,12 +1,14 @@
-﻿import {
+﻿import { useEffect, useMemo, useState } from "react";
+import {
   Alert,
   Card,
   CardContent,
-  Tabs,
+  Stack,
   Tab,
+  Tabs,
   Typography,
 } from "@mui/material";
-import type { Project } from "../projects-types";
+import type { Project, Task } from "../projects-types";
 import type {
   TasksQueryResult,
   CreateTaskMutationResult,
@@ -15,7 +17,8 @@ import type {
 } from "../projects-hooks";
 import { TasksList } from "./TasksList";
 import { TaskForm } from "./TaskForm";
-import { useState } from "react";
+import { TaskCommentsPanel } from "./TaskCommentsPanel";
+import { useTaskComments } from "../task-comments-hooks";
 
 const tabs = [
   { value: "tasks", label: "Tasks" },
@@ -38,6 +41,27 @@ export const ProjectTasksPane = ({
   deleteTaskMutation,
 }: ProjectTasksPaneProps) => {
   const [tab, setTab] = useState("tasks");
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+
+  const tasks = tasksQuery.data ?? [];
+
+  useEffect(() => {
+    if (tab === "tasks" && tasks.length > 0 && !selectedTaskId) {
+      setSelectedTaskId(tasks[0].id);
+    }
+  }, [tab, tasks, selectedTaskId]);
+
+  const selectedTask: Task | null = useMemo(() => {
+    if (!selectedTaskId) {
+      return null;
+    }
+    return tasks.find((task) => task.id === selectedTaskId) ?? null;
+  }, [tasks, selectedTaskId]);
+
+  const { commentsQuery, createCommentMutation } = useTaskComments(
+    project?.id ?? null,
+    selectedTask?.id ?? null,
+  );
 
   if (!project) {
     return (
@@ -70,17 +94,30 @@ export const ProjectTasksPane = ({
         </Tabs>
 
         {tab === "tasks" ? (
-          <TasksList
-            tasksQuery={tasksQuery}
-            onUpdate={(taskId, payload) => updateTaskMutation.mutate({ taskId, payload })}
-            onDelete={(taskId) => deleteTaskMutation.mutate(taskId)}
-          />
+          <Stack direction={{ xs: "column", md: "row" }} spacing={3} alignItems="stretch">
+            <TasksList
+              tasksQuery={tasksQuery}
+              onUpdate={(taskId, payload) => updateTaskMutation.mutate({ taskId, payload })}
+              onDelete={(taskId) => deleteTaskMutation.mutate(taskId)}
+              onSelect={(task) => setSelectedTaskId(task.id)}
+              selectedTaskId={selectedTaskId}
+            />
+            <TaskCommentsPanel
+              projectId={project.id}
+              task={selectedTask}
+              commentsQuery={commentsQuery}
+              createCommentMutation={createCommentMutation}
+            />
+          </Stack>
         ) : (
           <TaskForm
             onSubmit={async (payload) => {
               try {
-                await createTaskMutation.mutateAsync(payload);
+                const created = await createTaskMutation.mutateAsync(payload);
                 setTab("tasks");
+                if (created?.id) {
+                  setSelectedTaskId(created.id);
+                }
               } catch {
                 // Error surfaced below.
               }

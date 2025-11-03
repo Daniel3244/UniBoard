@@ -5,6 +5,7 @@
   IconButton,
   List,
   ListItem,
+  ListItemButton,
   ListItemText,
   MenuItem,
   Select,
@@ -15,24 +16,32 @@ import dayjs from "dayjs";
 import type { TasksQueryResult } from "../projects-hooks";
 import {
   TASK_STATUS_OPTIONS,
+  type Task,
   type TaskStatus,
   type UpdateTaskPayload,
 } from "../projects-types";
 
-const statusColors: Record<TaskStatus, "default" | "success" | "warning" | "info"> =
-  {
-    todo: "info",
-    in_progress: "warning",
-    done: "success",
-  };
+const statusColors: Record<TaskStatus, "default" | "success" | "warning" | "info"> = {
+  todo: "info",
+  in_progress: "warning",
+  done: "success",
+};
 
 type TasksListProps = {
   tasksQuery: TasksQueryResult;
   onUpdate: (taskId: string, payload: UpdateTaskPayload) => void;
   onDelete: (taskId: string) => void;
+  onSelect?: (task: Task) => void;
+  selectedTaskId?: string | null;
 };
 
-export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) => {
+export const TasksList = ({
+  tasksQuery,
+  onUpdate,
+  onDelete,
+  onSelect,
+  selectedTaskId,
+}: TasksListProps) => {
   const tasks = tasksQuery.data ?? [];
 
   if (tasksQuery.isPending) {
@@ -68,31 +77,39 @@ export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) =>
           }
           sx={{ gap: 2, alignItems: "flex-start" }}
         >
-          <ListItemText
-            primary={
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 2,
-                  flexWrap: "wrap",
-                }}
-              >
-                <Typography fontWeight={600}>{task.title}</Typography>
-                <Chip
-                  label={
-                    TASK_STATUS_OPTIONS.find((option) => option.value === task.status)
-                      ?.label ?? task.status
-                  }
-                  color={statusColors[task.status] ?? "default"}
-                />
-              </Box>
-            }
-            secondary={`Created: ${dayjs(task.createdAt).format(
-              "YYYY-MM-DD HH:mm",
-            )}`}
-          />
+          <ListItemButton
+            selected={task.id === selectedTaskId}
+            onClick={() => onSelect?.(task)}
+            sx={{
+              borderRadius: 1,
+            }}
+          >
+            <ListItemText
+              primary={
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 2,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <Typography fontWeight={600}>{task.title}</Typography>
+                  <Chip
+                    label={
+                      TASK_STATUS_OPTIONS.find((option) => option.value === task.status)
+                        ?.label ?? task.status
+                    }
+                    color={statusColors[task.status] ?? "default"}
+                  />
+                </Box>
+              }
+              secondary={`Created: ${dayjs(task.createdAt).format(
+                "YYYY-MM-DD HH:mm",
+              )}`}
+            />
+          </ListItemButton>
           <Select
             size="small"
             value={task.status}
