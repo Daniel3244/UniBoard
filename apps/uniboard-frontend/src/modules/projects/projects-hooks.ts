@@ -1,4 +1,4 @@
-import {
+﻿import {
   useMutation,
   useQuery,
   useQueryClient,
@@ -14,7 +14,6 @@ import type {
   Task,
   UpdateTaskPayload,
 } from "./projects-types";
-import { useProjectsStore } from "./store";
 
 const PROJECTS_QUERY_KEY = ["projects"] as const;
 
@@ -53,7 +52,6 @@ export const useProjectsQueries = (projectId?: string) => {
   } = useAuthContext();
   const token = accessToken ?? undefined;
   const queryClient = useQueryClient();
-  const selectProject = useProjectsStore((state) => state.selectProject);
 
   const projectsQuery: ProjectsQueryResult = useQuery({
     queryKey: PROJECTS_QUERY_KEY,
@@ -82,20 +80,17 @@ export const useProjectsQueries = (projectId?: string) => {
     queryClient.invalidateQueries({ queryKey: PROJECTS_QUERY_KEY });
 
   const createProjectMutation: CreateProjectMutationResult = useMutation({
-    mutationFn: (payload) => apiClient.post<Project>("/api/projects", payload, token),
-    onSuccess: (project) => {
+    mutationFn: (payload) =>
+      apiClient.post<Project>("/api/projects", payload, token),
+    onSuccess: () => {
       invalidateProjects();
-      selectProject(project.id);
     },
   });
 
   const deleteProjectMutation: DeleteProjectMutationResult = useMutation({
     mutationFn: (id) => apiClient.delete<void>(`/api/projects/${id}`, token),
-    onSuccess: (_, id) => {
+    onSuccess: () => {
       invalidateProjects();
-      if (projectId === id) {
-        selectProject(null);
-      }
     },
   });
 
@@ -112,6 +107,7 @@ export const useProjectsQueries = (projectId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      invalidateProjects();
     },
   });
 
@@ -128,6 +124,7 @@ export const useProjectsQueries = (projectId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      invalidateProjects();
     },
   });
 
@@ -143,6 +140,7 @@ export const useProjectsQueries = (projectId?: string) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tasksQueryKey });
+      invalidateProjects();
     },
   });
 

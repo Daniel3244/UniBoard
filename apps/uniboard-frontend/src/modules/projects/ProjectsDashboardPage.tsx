@@ -11,24 +11,8 @@ export const ProjectsDashboardPage = () => {
   const { auth } = useAuthContext();
   const navigate = useNavigate();
   const { projectId } = useParams<{ projectId?: string }>();
-  const { selectedProjectId, selectProject } = useProjectsStore((state) => ({
-    selectedProjectId: state.selectedProjectId,
-    selectProject: state.selectProject,
-  }));
-
-  useEffect(() => {
-    if (projectId) {
-      selectProject(projectId);
-    } else if (!projectId && selectedProjectId) {
-      selectProject(null);
-    }
-  }, [projectId, selectedProjectId, selectProject]);
-
-  useEffect(() => {
-    if (!selectedProjectId && projectId) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [selectedProjectId, projectId, navigate]);
+  const selectedProjectId = useProjectsStore((state) => state.selectedProjectId);
+  const selectProject = useProjectsStore((state) => state.selectProject);
 
   const {
     projectsQuery,
@@ -46,13 +30,29 @@ export const ProjectsDashboardPage = () => {
     [projects, selectedProjectId],
   );
 
-  const handleProjectSelect = (id: string | null) => {
-    selectProject(id);
-    if (id) {
-      navigate(`/projects/${id}`, { replace: true });
-    } else {
+  useEffect(() => {
+    const normalized = projectId ?? null;
+    if (selectedProjectId !== normalized) {
+      selectProject(normalized);
+    }
+  }, [projectId, selectedProjectId, selectProject]);
+
+  useEffect(() => {
+    if (selectedProjectId && !selectedProject) {
+      selectProject(null);
       navigate("/dashboard", { replace: true });
     }
+  }, [selectedProjectId, selectedProject, navigate, selectProject]);
+
+  const handleProjectSelect = (id: string | null) => {
+    const normalized = id ?? null;
+    if (selectedProjectId !== normalized) {
+      selectProject(normalized);
+    }
+
+    navigate(normalized ? `/projects/${normalized}` : "/dashboard", {
+      replace: true,
+    });
   };
 
   return (
