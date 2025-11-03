@@ -1,4 +1,4 @@
-﻿export type TaskStatus = "Todo" | "In Progress" | "Done";
+export type TaskStatus = "todo" | "in_progress" | "done";
 
 export type Project = {
   id: string;
@@ -25,3 +25,9 @@ export type CreateTaskPayload = {
 };
 
 export type UpdateTaskPayload = Partial<CreateTaskPayload>;
+
+export const TASK_STATUS_OPTIONS: Array<{ value: TaskStatus; label: string }> = [
+  { value: "todo", label: "Todo" },
+  { value: "in_progress", label: "In Progress" },
+  { value: "done", label: "Done" },
+];

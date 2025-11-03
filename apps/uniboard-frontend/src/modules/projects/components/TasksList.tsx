@@ -13,15 +13,18 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import dayjs from "dayjs";
 import type { TasksQueryResult } from "../projects-hooks";
-import type { TaskStatus, UpdateTaskPayload } from "../projects-types";
+import {
+  TASK_STATUS_OPTIONS,
+  type TaskStatus,
+  type UpdateTaskPayload,
+} from "../projects-types";
 
-const statusColors: Record<TaskStatus, "default" | "success" | "warning" | "info"> = {
-  Todo: "info",
-  "In Progress": "warning",
-  Done: "success",
-};
-
-const statusOptions: TaskStatus[] = ["Todo", "In Progress", "Done"];
+const statusColors: Record<TaskStatus, "default" | "success" | "warning" | "info"> =
+  {
+    todo: "info",
+    in_progress: "warning",
+    done: "success",
+  };
 
 type TasksListProps = {
   tasksQuery: TasksQueryResult;
@@ -73,7 +76,10 @@ export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) =>
               >
                 <Typography fontWeight={600}>{task.title}</Typography>
                 <Chip
-                  label={task.status}
+                  label={
+                    TASK_STATUS_OPTIONS.find((option) => option.value === task.status)
+                      ?.label ?? task.status
+                  }
                   color={statusColors[task.status] ?? "default"}
                 />
               </Box>
@@ -91,9 +97,9 @@ export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) =>
               })
             }
           >
-            {statusOptions.map((status) => (
-              <MenuItem key={status} value={status}>
-                {status}
+            {TASK_STATUS_OPTIONS.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
               </MenuItem>
             ))}
           </Select>

@@ -51,6 +51,17 @@ export const ProjectsList = ({
 
   const sortedProjects = useMemo(() => sortProjects(projects), [projects]);
 
+  const handleDelete = (projectId: string) => {
+    const wasSelected = selectedProjectId === projectId;
+    deleteProjectMutation.mutate(projectId, {
+      onSuccess: () => {
+        if (wasSelected) {
+          onSelect(null);
+        }
+      },
+    });
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!name.trim()) {
@@ -135,7 +146,7 @@ export const ProjectsList = ({
                     <IconButton
                       edge="end"
                       aria-label="delete"
-                      onClick={() => deleteProjectMutation.mutate(project.id)}
+                      onClick={() => handleDelete(project.id)}
                       disabled={deleteProjectMutation.isPending}
                     >
                       <DeleteIcon />
