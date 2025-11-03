@@ -19,6 +19,16 @@ builder.Services.AddAutoMapper(typeof(Program).Assembly);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddOpenApi();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("Frontend", policy =>
+        policy.WithOrigins(
+                "http://localhost:5173",
+                "http://127.0.0.1:5173")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials());
+});
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -63,6 +73,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("Frontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
