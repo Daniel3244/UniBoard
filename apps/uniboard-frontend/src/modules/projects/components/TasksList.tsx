@@ -94,6 +94,7 @@ export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) =>
             onChange={(event) =>
               onUpdate(task.id, {
                 status: event.target.value as TaskStatus,
+                title: task.title,
               })
             }
           >
