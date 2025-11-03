@@ -1,23 +1,30 @@
 # UniBoard
 
-UniBoard to wieloplatformowy projekt demonstracyjny typu SaaS do zarządzania projektami i przepływami pracy. Monorepo pozwala na przełączanie się pomiędzy wariantami backendu (.NET/Java) oraz frontendem (React/Angular), pokazując dobre praktyki architektoniczne, testowe i DevOps.
+UniBoard is a multi-platform SaaS demo that showcases clean architecture, testing strategy, and DevOps practices across interchangeable backends (.NET / Java) and frontends (React / Angular).
 
-## Obecny status
+## Current Scope
 
-- [ ] Inicjalizacja backendu (.NET / Java)
-- [ ] Warstwy domenowe i aplikacyjne
-- [ ] Konfiguracja infrastruktury (PostgreSQL, Redis, kolejki)
-- [ ] Frontend (React/Angular)
-- [ ] CI/CD oraz infrastruktura jako kod
-- [ ] Do uzgodnienia: wspólny styl commitów i komentarzy w zespole
+- [ ] Backend bootstrap (.NET / Java)
+- [ ] Domain and application layers
+- [ ] Infrastructure setup (PostgreSQL, Redis, queues)
+- [ ] Frontend (React / Angular)
+- [ ] CI/CD and infrastructure as code
+- [ ] Shared guidelines for commits and comments
 
-## Backend (.NET) – uwierzytelnianie
+## Backend (.NET) – authentication
 
-- `POST /api/auth/register` – rejestruje użytkownika, pierwszy z nich otrzymuje rolę Admin.
-- `POST /api/auth/login` – zwraca parę tokenów (JWT + refresh).
-- `POST /api/auth/refresh` – wydaje nowe tokeny po podaniu ważnego refresh tokenu.
-- Endpointy projektów i zadań wymagają autoryzacji JWT; operacje usuwania są ograniczone do roli Admin.
+- `POST /api/auth/register` creates a user (the first one becomes Admin).
+- `POST /api/auth/login` returns an access token plus refresh token.
+- `POST /api/auth/refresh` issues a fresh token pair when the refresh token is valid.
+- Project and task endpoints require JWT; delete operations are limited to Admin.
 
-## Uruchomienie (lokalnie)
+## Frontend (React + TypeScript)
 
-Instrukcje pojawią się wraz z rozbudową projektu. Docelowo `docker compose -f docker-compose.dev.yml up --build` uruchomi pełne środowisko deweloperskie.
+- Lives in `apps/uniboard-frontend` (Vite, React Router, Material UI).
+- Pages: Login, Register, Dashboard (lists projects fetched from the API).
+- Tokens are persisted in `localStorage`; backend URL comes from `VITE_API_URL` (defaults to `http://localhost:5174`).
+- Run locally with `npm install` followed by `npm run dev` inside the frontend directory.
+
+## Local Development
+
+Instructions for running the full stack will be added as the project grows. The end goal is to run everything through `docker compose -f docker-compose.dev.yml up --build`.
