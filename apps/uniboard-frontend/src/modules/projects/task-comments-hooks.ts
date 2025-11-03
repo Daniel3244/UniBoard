@@ -52,7 +52,15 @@ export const useTaskComments = (projectId: string | null, taskId: string | null)
 
       queryClient.setQueryData<Comment[]>(
         buildCommentQueryKey(projectId, taskId),
-        (current) => (current ? [...current, comment] : [comment]),
+        (current) => {
+          if (!current) {
+            return [comment];
+          }
+          if (current.some((existing) => existing.id === comment.id)) {
+            return current;
+          }
+          return [...current, comment];
+        },
       );
     },
   });
