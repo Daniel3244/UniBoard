@@ -63,7 +63,7 @@ export const RegisterPage = () => {
               </Typography>
             </Box>
 
-            {error && <Alert severity="error">{error}</Alert>}
+            {error ? <Alert severity="error">{error}</Alert> : null}
 
             <TextField
               label="Adres e-mail"
