@@ -1,4 +1,5 @@
-using System.Text;
+﻿using System.Text;
+using System.Threading.Tasks;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -59,6 +60,21 @@ builder.Services.AddAuthentication(options =>
             ValidAudience = jwtOptions.Audience,
             IssuerSigningKey = signingKey,
             ClockSkew = TimeSpan.FromMinutes(1)
+        };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
         };
     });
 
