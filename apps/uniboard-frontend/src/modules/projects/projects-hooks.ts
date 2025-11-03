@@ -7,6 +7,7 @@
 } from "@tanstack/react-query";
 import { apiClient } from "../shared/api-client";
 import { useAuthContext } from "../auth/AuthContext";
+import { useNotification } from "../shared/NotificationProvider";
 import type {
   CreateProjectPayload,
   CreateTaskPayload,
@@ -14,6 +15,7 @@ import type {
   Task,
   UpdateTaskPayload,
 } from "./projects-types";
+import { useTasksRealtime } from "./useTasksRealtime";
 
 const PROJECTS_QUERY_KEY = ["projects"] as const;
 
@@ -52,6 +54,7 @@ export const useProjectsQueries = (projectId?: string) => {
   } = useAuthContext();
   const token = accessToken ?? undefined;
   const queryClient = useQueryClient();
+  const notify = useNotification();
 
   const projectsQuery: ProjectsQueryResult = useQuery({
     queryKey: PROJECTS_QUERY_KEY,
@@ -145,6 +148,50 @@ export const useProjectsQueries = (projectId?: string) => {
   });
 
   const projects = projectsQuery.data ?? [];
+
+  useTasksRealtime(projectId ?? null, {
+    onTaskCreated: (task) => {
+      queryClient.setQueryData(tasksQueryKey, (current: Task[] | undefined) => {
+        if (!current) {
+          return [task];
+        }
+        if (current.some((item) => item.id === task.id)) {
+          return current;
+        }
+        return [task, ...current];
+      });
+      notify({
+        message: `New task "${task.title}" was added`,
+        severity: "success",
+      });
+    },
+    onTaskUpdated: (task) => {
+      queryClient.setQueryData(tasksQueryKey, (current: Task[] | undefined) => {
+        if (!current) {
+          return current;
+        }
+        return current.map((item) =>
+          item.id === task.id ? { ...item, ...task } : item,
+        );
+      });
+      notify({
+        message: `Task "${task.title}" was updated`,
+        severity: "info",
+      });
+    },
+    onTaskDeleted: (taskId) => {
+      queryClient.setQueryData(tasksQueryKey, (current: Task[] | undefined) => {
+        if (!current) {
+          return current;
+        }
+        return current.filter((item) => item.id !== taskId);
+      });
+      notify({
+        message: "A task was removed",
+        severity: "warning",
+      });
+    },
+  });
 
   return {
     projectsQuery,

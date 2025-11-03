@@ -29,6 +29,7 @@ export const TaskForm = ({ onSubmit, isSubmitting, error }: TaskFormProps) => {
     <Stack component="form" onSubmit={handleSubmit} spacing={2}>
       <TextField
         label="Task title"
+        name="taskTitle"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         required
@@ -36,6 +37,7 @@ export const TaskForm = ({ onSubmit, isSubmitting, error }: TaskFormProps) => {
       <TextField
         select
         label="Status"
+        name="taskStatus"
         value={status}
         onChange={(event) =>
           setStatus(event.target.value as CreateTaskPayload["status"])

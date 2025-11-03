@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Uniboard.Api.Realtime;
 using Uniboard.Api.Validators;
 using Uniboard.Application;
 using Uniboard.Domain.Entities;
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateTaskRequestValidator>();
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -80,5 +82,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<TaskHub>("/hubs/tasks");
 
 app.Run();

@@ -56,8 +56,13 @@ export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) =>
       {tasks.map((task) => (
         <ListItem
           key={task.id}
+          data-testid={`task-item-${task.id}`}
           secondaryAction={
-            <IconButton edge="end" onClick={() => onDelete(task.id)}>
+            <IconButton
+              edge="end"
+              aria-label="delete"
+              onClick={() => onDelete(task.id)}
+            >
               <DeleteIcon />
             </IconButton>
           }
@@ -91,6 +96,7 @@ export const TasksList = ({ tasksQuery, onUpdate, onDelete }: TasksListProps) =>
           <Select
             size="small"
             value={task.status}
+            data-testid={`task-status-${task.id}`}
             onChange={(event) =>
               onUpdate(task.id, {
                 status: event.target.value as TaskStatus,

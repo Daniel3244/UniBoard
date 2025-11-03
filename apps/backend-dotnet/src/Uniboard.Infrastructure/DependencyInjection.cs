@@ -6,6 +6,7 @@ using Uniboard.Application.Common.Interfaces;
 using Uniboard.Application.Projects;
 using Uniboard.Application.Tasks;
 using Uniboard.Application.Users;
+using Uniboard.Infrastructure.Administration;
 using Uniboard.Infrastructure.Authentication;
 using Uniboard.Infrastructure.Persistence;
 using Uniboard.Infrastructure.Repositories;
@@ -28,6 +29,7 @@ public static class DependencyInjection
             options.UseNpgsql(connectionString));
 
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        services.Configure<AdminSeedOptions>(configuration.GetSection(AdminSeedOptions.SectionName));
 
         services.AddScoped<IApplicationDbContext>(provider =>
             provider.GetRequiredService<UniboardDbContext>());
@@ -36,6 +38,7 @@ public static class DependencyInjection
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IPasswordHasher, Pbkdf2PasswordHasher>();
+        services.AddHostedService<AdminSeederHostedService>();
 
         return services;
     }

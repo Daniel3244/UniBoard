@@ -98,12 +98,14 @@ export const ProjectsList = ({
           <Stack component="form" onSubmit={handleSubmit} spacing={2}>
             <TextField
               label="Project name"
+              name="projectName"
               value={name}
               onChange={(event) => setName(event.target.value)}
               required
             />
             <TextField
               label="Description"
+              name="projectDescription"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               multiline
@@ -154,6 +156,8 @@ export const ProjectsList = ({
                   }
                 >
                   <ListItemButton
+                    data-testid="project-item"
+                    data-project-name={project.name}
                     selected={project.id === selectedProjectId}
                     onClick={() => onSelect(project.id)}
                   >

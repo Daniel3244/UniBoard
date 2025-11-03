@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uniboard.Application", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uniboard.Infrastructure", "src\Uniboard.Infrastructure\Uniboard.Infrastructure.csproj", "{7072A3F1-1C72-4136-BC0E-E1BB98EA22EC}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5A6CA1EA-3DD0-49B9-8241-5DA4B5322A80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uniboard.Api.Tests", "tests\Uniboard.Api.Tests\Uniboard.Api.Tests.csproj", "{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +75,18 @@ Global
 		{7072A3F1-1C72-4136-BC0E-E1BB98EA22EC}.Release|x64.Build.0 = Release|Any CPU
 		{7072A3F1-1C72-4136-BC0E-E1BB98EA22EC}.Release|x86.ActiveCfg = Release|Any CPU
 		{7072A3F1-1C72-4136-BC0E-E1BB98EA22EC}.Release|x86.Build.0 = Release|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Debug|x64.Build.0 = Debug|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Debug|x86.Build.0 = Debug|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x64.ActiveCfg = Release|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x64.Build.0 = Release|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x86.ActiveCfg = Release|Any CPU
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -80,5 +96,6 @@ Global
 		{691F15AF-AA26-45CA-AD2D-23581873DF51} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{33CE8F5E-3FAB-4596-B370-FEFC4B7BBCA8} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{7072A3F1-1C72-4136-BC0E-E1BB98EA22EC} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F} = {5A6CA1EA-3DD0-49B9-8241-5DA4B5322A80}
 	EndGlobalSection
 EndGlobal

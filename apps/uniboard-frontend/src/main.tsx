@@ -4,8 +4,9 @@ import { BrowserRouter } from "react-router-dom";
 import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import App from "./App";
 import { AuthProvider } from "./modules/auth/AuthContext";
+import { NotificationProvider } from "./modules/shared/NotificationProvider";
+import App from "./App";
 import "./styles/index.css";
 
 const theme = createTheme({
@@ -29,7 +30,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <App />
+            <NotificationProvider>
+              <App />
+            </NotificationProvider>
           </AuthProvider>
         </BrowserRouter>
         <ReactQueryDevtools initialIsOpen={false} />

@@ -1,7 +1,9 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Uniboard.Api.Contracts.Tasks;
+using Uniboard.Api.Realtime;
 using Uniboard.Application.Projects;
 using Uniboard.Application.Tasks;
 using Uniboard.Domain.Entities;
@@ -14,6 +16,7 @@ namespace Uniboard.Api.Controllers;
 public class TasksController(
     IProjectRepository projectRepository,
     ITaskRepository taskRepository,
+    IHubContext<TaskHub> hubContext,
     IMapper mapper) : ControllerBase
 {
     [HttpGet]
@@ -62,6 +65,10 @@ public class TasksController(
         await taskRepository.AddAsync(task, cancellationToken);
 
         var response = mapper.Map<TaskResponse>(task);
+        await hubContext.Clients
+            .Group(TaskHub.GetGroupName(projectId))
+            .SendAsync("TaskCreated", response, cancellationToken: cancellationToken);
+
         return CreatedAtAction(nameof(GetTask), new { projectId, taskId = task.Id }, response);
     }
 
@@ -83,6 +90,11 @@ public class TasksController(
 
         await taskRepository.UpdateAsync(task, cancellationToken);
 
+        var response = mapper.Map<TaskResponse>(task);
+        await hubContext.Clients
+            .Group(TaskHub.GetGroupName(projectId))
+            .SendAsync("TaskUpdated", response, cancellationToken: cancellationToken);
+
         return NoContent();
     }
 
@@ -102,6 +114,9 @@ public class TasksController(
         }
 
         await taskRepository.DeleteAsync(task, cancellationToken);
+        await hubContext.Clients
+            .Group(TaskHub.GetGroupName(projectId))
+            .SendAsync("TaskDeleted", taskId, cancellationToken: cancellationToken);
         return NoContent();
     }
 
