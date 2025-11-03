@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { LoginPage } from "./modules/auth/LoginPage";
 import { RegisterPage } from "./modules/auth/RegisterPage";
-import { DashboardPage } from "./modules/dashboard/DashboardPage";
+import { ProjectsDashboardPage } from "./modules/projects/ProjectsDashboardPage";
 import { Layout } from "./modules/shared/Layout";
 import { ProtectedRoute } from "./modules/shared/ProtectedRoute";
 
@@ -16,7 +16,15 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <DashboardPage />
+              <ProjectsDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/projects/:projectId"
+          element={
+            <ProtectedRoute>
+              <ProjectsDashboardPage />
             </ProtectedRoute>
           }
         />

@@ -1,4 +1,4 @@
-# UniBoard
+﻿# UniBoard
 
 UniBoard is a multi-platform SaaS demo that showcases clean architecture, testing strategy, and DevOps practices across interchangeable backends (.NET / Java) and frontends (React / Angular).
 
@@ -20,8 +20,9 @@ UniBoard is a multi-platform SaaS demo that showcases clean architecture, testin
 
 ## Frontend (React + TypeScript)
 
-- Lives in `apps/uniboard-frontend` (Vite, React Router, Material UI).
-- Pages: Login, Register, Dashboard (lists projects fetched from the API).
+- Lives in `apps/uniboard-frontend` (Vite, React Router, Material UI, Zustand, React Query).
+- Pages: Login, Register, Dashboard (lists and manages projects/tasks via the API).
+- Supports creating/deleting projects, viewing project tasks, creating tasks, and updating task status.
 - Tokens are persisted in `localStorage`; backend URL comes from `VITE_API_URL` (defaults to `http://localhost:5174`).
 - Run locally with `npm install` followed by `npm run dev` inside the frontend directory.
 

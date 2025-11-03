@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import {
   AppBar,
@@ -17,8 +17,8 @@ import { Outlet } from "react-router-dom";
 import { useAuthContext } from "../auth/AuthContext";
 
 const navItems = [
-  { to: "/login", label: "Logowanie" },
-  { to: "/register", label: "Rejestracja" },
+  { to: "/login", label: "Login" },
+  { to: "/register", label: "Register" },
   { to: "/dashboard", label: "Dashboard" },
 ];
 
@@ -33,6 +33,16 @@ export const Layout = () => {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const isActive = (path: string) => {
+    if (path === "/dashboard") {
+      return (
+        location.pathname === "/dashboard" ||
+        location.pathname.startsWith("/projects/")
+      );
+    }
+    return location.pathname === path;
   };
 
   return (
@@ -61,9 +71,7 @@ export const Layout = () => {
                   component={RouterLink}
                   to={item.to}
                   color="inherit"
-                  variant={
-                    location.pathname === item.to ? "outlined" : "text"
-                  }
+                  variant={isActive(item.to) ? "outlined" : "text"}
                 >
                   {item.label}
                 </Button>
@@ -85,7 +93,7 @@ export const Layout = () => {
                     component={RouterLink}
                     to={item.to}
                     onClick={handleMenuClose}
-                    selected={location.pathname === item.to}
+                    selected={isActive(item.to)}
                   >
                     {item.label}
                   </MenuItem>
@@ -98,11 +106,11 @@ export const Layout = () => {
                 <Box sx={{ textAlign: "right" }}>
                   <Typography variant="subtitle2">{auth.email}</Typography>
                   <Typography variant="caption" color="inherit">
-                    Rola: {auth.role}
+                    Role: {auth.role}
                   </Typography>
                 </Box>
                 <Button color="inherit" onClick={logout}>
-                  Wyloguj
+                  Logout
                 </Button>
               </Box>
             ) : (
@@ -112,7 +120,7 @@ export const Layout = () => {
                 color="inherit"
                 underline="hover"
               >
-                Zaloguj
+                Login
               </Link>
             )}
           </Toolbar>
@@ -136,7 +144,7 @@ export const Layout = () => {
         }}
       >
         <Typography variant="body2">
-          UniBoard • panel demo – {new Date().getFullYear()}
+          UniBoard demo console · {new Date().getFullYear()}
         </Typography>
       </Box>
     </Box>

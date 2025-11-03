@@ -1,4 +1,4 @@
-type HttpMethod = "GET" | "POST";
+type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 const baseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:5174";
 
@@ -48,6 +48,21 @@ class ApiClient {
     return this.request<T>(path, {
       method: "POST",
       body: JSON.stringify(body),
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+  }
+
+  put<T>(path: string, body: unknown, token?: string) {
+    return this.request<T>(path, {
+      method: "PUT",
+      body: JSON.stringify(body),
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    });
+  }
+
+  delete<T>(path: string, token?: string) {
+    return this.request<T>(path, {
+      method: "DELETE",
       headers: token ? { Authorization: `Bearer ${token}` } : undefined,
     });
   }
