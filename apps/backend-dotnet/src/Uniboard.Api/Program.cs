@@ -85,3 +85,5 @@ app.MapControllers();
 app.MapHub<TaskHub>("/hubs/tasks");
 
 app.Run();
+
+public partial class Program;

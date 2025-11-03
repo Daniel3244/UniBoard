@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5A6CA1EA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uniboard.Api.Tests", "tests\Uniboard.Api.Tests\Uniboard.Api.Tests.csproj", "{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Uniboard.Api.IntegrationTests", "tests\Uniboard.Api.IntegrationTests\Uniboard.Api.IntegrationTests.csproj", "{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,6 +89,18 @@ Global
 		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x64.Build.0 = Release|Any CPU
 		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x86.ActiveCfg = Release|Any CPU
 		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F}.Release|x86.Build.0 = Release|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Debug|x64.Build.0 = Debug|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Debug|x86.Build.0 = Debug|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Release|x64.ActiveCfg = Release|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Release|x64.Build.0 = Release|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Release|x86.ActiveCfg = Release|Any CPU
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -97,5 +111,6 @@ Global
 		{33CE8F5E-3FAB-4596-B370-FEFC4B7BBCA8} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{7072A3F1-1C72-4136-BC0E-E1BB98EA22EC} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 		{EAA028BC-E0BA-4C27-A1AF-CC511EBD3D0F} = {5A6CA1EA-3DD0-49B9-8241-5DA4B5322A80}
+		{D0BDDFF1-1870-4F01-BCAA-804FA0ED4881} = {5A6CA1EA-3DD0-49B9-8241-5DA4B5322A80}
 	EndGlobalSection
 EndGlobal
