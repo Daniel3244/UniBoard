@@ -1,0 +1,58 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: uniboard-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-uniboard}
+      POSTGRES_USER: ${POSTGRES_USER:-uniboard}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-uniboard}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend-dotnet
+      dockerfile: Dockerfile
+    container_name: uniboard-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Database: Host=db;Port=5432;Database=${POSTGRES_DB:-uniboard};Username=${POSTGRES_USER:-uniboard};Password=${POSTGRES_PASSWORD:-uniboard}
+      Jwt__Issuer: ${JWT_ISSUER:-Uniboard}
+      Jwt__Audience: ${JWT_AUDIENCE:-UniboardApp}
+      Jwt__Secret: ${JWT_SECRET:-3d2d8c4f9b6e4a11a9832ff460b7e52cf9d1a64bb9c2f0d7e4c1a8b6ff739d2a}
+      Jwt__AccessTokenLifetimeMinutes: ${JWT_ACCESS_TOKEN_MINUTES:-30}
+      Jwt__RefreshTokenLifetimeDays: ${JWT_REFRESH_TOKEN_DAYS:-7}
+      AdminSeed__Enabled: "true"
+      AdminSeed__Email: ${ADMIN_EMAIL:-admin@uniboard.local}
+      AdminSeed__Password: ${ADMIN_PASSWORD:-ChangeMe123!}
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+
+  frontend:
+    build:
+      context: ./apps/uniboard-frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${FRONTEND_VITE_API_URL:-http://localhost:8080}
+    container_name: uniboard-frontend
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "3000:80"
+
+volumes:
+  db-data:

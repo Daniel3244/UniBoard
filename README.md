@@ -1,31 +1,117 @@
-﻿# UniBoard
+# UniBoard
 
-UniBoard is a multi-platform SaaS demo that showcases clean architecture, testing strategy, and DevOps practices across interchangeable backends (.NET / Java) and frontends (React / Angular).
+UniBoard is a portfolio-ready SaaS platform for managing workstreams across organisations, projects, boards, tasks, comments and realtime activity. The repository demonstrates clean architecture, rich domain testing, container-first DevOps and a modern React UI talking to an ASP.NET Core backend.
 
-## Current Scope
+## Demo
 
-- [ ] Backend bootstrap (.NET / Java)
-- [ ] Domain and application layers
-- [ ] Infrastructure setup (PostgreSQL, Redis, queues)
-- [ ] Frontend (React / Angular)
-- [ ] CI/CD and infrastructure as code
-- [ ] Shared guidelines for commits and comments
+- **App:** _add the live URL once deployed_ (deploy instructions below)
+- **API docs:** `https://<your-app-host>/docs`
 
-## Backend (.NET) – authentication
+## Highlights
 
-- `POST /api/auth/register` creates a user (the first one becomes Admin).
-- `POST /api/auth/login` returns an access token plus refresh token.
-- `POST /api/auth/refresh` issues a fresh token pair when the refresh token is valid.
-- Project and task endpoints require JWT; delete operations are limited to Admin.
+- ASP.NET Core 9 (CQRS, MediatR-style application layer, SignalR realtime hubs)
+- PostgreSQL + EF Core with migrations and automated seeding
+- React + Vite + MUI + Zustand + React Query, bundled for production and served via Nginx
+- Realtime updates (SignalR hubs for task board + activity feed)
+- JWT authentication with refresh tokens, role-based policies and admin bootstrapper
+- Full-stack testing: unit + integration (Testcontainers) + Cypress e2e (headless)
+- Dockerfiles for backend/frontend, `docker-compose` stack (API + Postgres + web)
+- GitHub Actions CI (restore, build, test, docker build)
 
-## Frontend (React + TypeScript)
+## Repository Layout
 
-- Lives in `apps/uniboard-frontend` (Vite, React Router, Material UI, Zustand, React Query).
-- Pages: Login, Register, Dashboard (lists and manages projects/tasks via the API).
-- Supports creating/deleting projects, viewing project tasks, creating tasks, and updating task status.
-- Tokens are persisted in `localStorage`; backend URL comes from `VITE_API_URL` (defaults to `http://localhost:5174`).
-- Run locally with `npm install` followed by `npm run dev` inside the frontend directory.
+- `apps/backend-dotnet` - ASP.NET Core solution (`src`, `tests`)
+- `apps/uniboard-frontend` - React + TypeScript client
+- `docker-compose.yml` - local stack (Postgres, API, frontend)
+- `.github/workflows/ci.yml` - CI pipeline
+- `deploy/` - cloud deployment manifests (Render blueprint)
+- `.env.example` - environment variables used by Docker/infra
 
-## Local Development
+## Quick Start (Docker)
 
-Instructions for running the full stack will be added as the project grows. The end goal is to run everything through `docker compose -f docker-compose.dev.yml up --build`.
+Prerequisites: Docker Desktop (with Compose plugin), Node 20, .NET SDK 9.0 (for local tooling), PowerShell/Bash.
+
+1. Copy environment defaults and adjust secrets:
+   ```bash
+   cp .env.example .env
+   ```
+   The `JWT_SECRET` must be at least 32 bytes (the sample value is already long enough); change it for real deployments.
+2. Launch the stack:
+   ```bash
+   docker compose up --build
+   ```
+3. Open the apps:
+   - Frontend: http://localhost:3000
+   - API: http://localhost:8080
+   - Swagger UI: http://localhost:8080/docs
+   - Health check: http://localhost:8080/healthz
+
+The compose file provisions Postgres with a persisted volume, runs database migrations on API startup, and seeds an admin account from the `.env` values (`ADMIN_EMAIL` / `ADMIN_PASSWORD`).
+
+### Stopping & resetting
+
+- Stop the stack: `docker compose down`
+- Remove the database volume: `docker compose down -v`
+
+## Local Development Without Docker
+
+### Backend
+
+```bash
+cd apps/backend-dotnet
+dotnet restore
+dotnet ef database update
+dotnet run
+```
+
+### Frontend
+
+```bash
+cd apps/uniboard-frontend
+npm ci
+npm run dev
+```
+
+Set `VITE_API_URL` in `.env.development` to match the backend URL (defaults to `http://localhost:5174`).
+
+## Testing
+
+- Backend unit + integration tests: `dotnet test apps/backend-dotnet/Uniboard.sln`
+- Frontend build check (type + lint coverage): `npm run build` inside `apps/uniboard-frontend`
+- Cypress e2e (requires services running): `npm run test:e2e`
+
+## Continuous Integration
+
+`.github/workflows/ci.yml` runs on every push and pull request:
+
+1. Restore + build + test the .NET solution (unit + Testcontainers integration tests)
+2. Install frontend dependencies and run a production build
+3. Build backend and frontend Docker images (`uniboard/backend:ci`, `uniboard/frontend:ci`)
+
+Artifacts are ready for publishing to a registry or deployment workflow.
+
+## API Documentation
+
+- Swagger UI: `http://localhost:8080/docs`
+- OpenAPI JSON: `http://localhost:8080/docs/v1/swagger.json` (generated by Swashbuckle)
+- Health probe: `GET /healthz` returns a timestamped status payload
+
+JWT support is documented via the `Authorize` button (bearer tokens).
+
+## Deployment (Render)
+
+The `deploy/render.yaml` blueprint provisions:
+
+- **uniboard-api** - Docker-based web service from `apps/backend-dotnet/Dockerfile`
+- **uniboard-web** - Docker-based static frontend from `apps/uniboard-frontend/Dockerfile`
+- **uniboard-db** - managed Postgres instance
+
+Steps:
+
+1. Fork this repository and push to GitHub.
+2. In Render, create a Postgres instance named `uniboard-db`.
+3. Create a new Web Service from the repo, choose "Blueprint" and point to `deploy/render.yaml`.
+4. Set environment variables in the Render dashboard (override `Jwt__Secret`, `AdminSeed__Email`, `AdminSeed__Password`, and update `VITE_API_URL` to the public API URL after the first deploy).
+5. Trigger the deploy. Once live, update the **Demo** section above with the public URLs.
+
+The backend reads either `ConnectionStrings__Database` or `DATABASE_URL`, so Render's managed connection string works out-of-the-box. The frontend Docker build accepts a `VITE_API_URL` build argument; `render.yaml` wires this value to the backend service URL automatically.

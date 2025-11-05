@@ -1,4 +1,5 @@
 using System;
+using Npgsql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,14 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Database");
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            var databaseUrl = configuration["DATABASE_URL"];
+            if (!string.IsNullOrWhiteSpace(databaseUrl))
+            {
+                connectionString = BuildConnectionStringFromUrl(databaseUrl);
+            }
+        }
 
         if (string.IsNullOrWhiteSpace(connectionString))
         {
@@ -43,5 +52,22 @@ public static class DependencyInjection
         services.AddHostedService<AdminSeederHostedService>();
 
         return services;
+    }
+
+    private static string BuildConnectionStringFromUrl(string databaseUrl)
+    {
+        var builder = new NpgsqlConnectionStringBuilder(databaseUrl);
+
+        if (builder.SslMode == SslMode.Disable)
+        {
+            builder.SslMode = SslMode.Require;
+        }
+
+        if (builder.Port == 0)
+        {
+            builder.Port = 5432;
+        }
+
+        return builder.ConnectionString;
     }
 }

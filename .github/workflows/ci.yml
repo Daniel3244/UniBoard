@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - ".gitignore"
+      - "README.md"
+      - "docs/**"
+  pull_request:
+    branches:
+      - "*"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Restore backend dependencies
+        run: dotnet restore Uniboard.sln
+        working-directory: apps/backend-dotnet
+
+      - name: Build backend
+        run: dotnet build Uniboard.sln --configuration Release --no-restore
+        working-directory: apps/backend-dotnet
+
+      - name: Test backend
+        run: dotnet test Uniboard.sln --configuration Release --no-build --verbosity normal
+        working-directory: apps/backend-dotnet
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/uniboard-frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: apps/uniboard-frontend
+
+      - name: Build frontend
+        run: npm run build
+        working-directory: apps/uniboard-frontend
+
+      - name: Build backend container image
+        run: docker build -t uniboard/backend:ci -f apps/backend-dotnet/Dockerfile apps/backend-dotnet
+
+      - name: Build frontend container image
+        run: docker build -t uniboard/frontend:ci -f apps/uniboard-frontend/Dockerfile apps/uniboard-frontend

@@ -1,0 +1,45 @@
+services:
+  - type: web
+    name: uniboard-api
+    env: docker
+    plan: starter
+    dockerfilePath: apps/backend-dotnet/Dockerfile
+    autoDeploy: true
+    healthCheckPath: /healthz
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__Database
+        fromDatabase:
+          name: uniboard-db
+          property: connectionString
+      - key: Jwt__Secret
+        sync: false
+      - key: Jwt__Issuer
+        value: Uniboard
+      - key: Jwt__Audience
+        value: UniboardApp
+      - key: Jwt__AccessTokenLifetimeMinutes
+        value: "30"
+      - key: Jwt__RefreshTokenLifetimeDays
+        value: "7"
+      - key: AdminSeed__Enabled
+        value: "true"
+      - key: AdminSeed__Email
+        sync: false
+      - key: AdminSeed__Password
+        sync: false
+
+  - type: web
+    name: uniboard-web
+    env: docker
+    plan: starter
+    dockerfilePath: apps/uniboard-frontend/Dockerfile
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://REPLACE_WITH_API_HOST
+
+databases:
+  - name: uniboard-db
+    plan: free
