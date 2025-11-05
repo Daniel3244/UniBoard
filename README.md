@@ -1,11 +1,6 @@
 # UniBoard
 
-UniBoard is a portfolio-ready SaaS platform for managing workstreams across organisations, projects, boards, tasks, comments and realtime activity. The repository demonstrates clean architecture, rich domain testing, container-first DevOps and a modern React UI talking to an ASP.NET Core backend.
-
-## Demo
-
-- **App:** _add the live URL once deployed_ (deploy instructions below)
-- **API docs:** `https://<your-app-host>/docs`
+UniBoard is a ready SaaS platform for managing workstreams across organisations, projects, boards, tasks, comments and realtime activity. The repository demonstrates clean architecture, rich domain testing, container-first DevOps and a modern React UI talking to an ASP.NET Core backend.
 
 ## Highlights
 
